@@ -37,8 +37,7 @@ public class ListNotesActivity extends AppCompatActivity {
         listViewNotes.setOnItemClickListener((parent, view, position, id) -> {
             Note note = notes.get(position);
             Intent intent = new Intent(this, ReadNoteActivity.class);
-            intent.putExtra(ReadNoteActivity.EXTRA_TITLE, note.getTitle());
-            intent.putExtra(ReadNoteActivity.EXTRA_CONTENT, note.getContent());
+            intent.putExtra(ReadNoteActivity.EXTRA_NOTE_ID, note.getId());
             startActivity(intent);
         });
 

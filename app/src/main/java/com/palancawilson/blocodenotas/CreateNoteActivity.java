@@ -12,6 +12,12 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class CreateNoteActivity extends AppCompatActivity {
 
+    public static final String EXTRA_NOTE_ID = "com.palancawilson.blocodenotas.EXTRA_NOTE_ID";
+
+    private EditText editTextTitle;
+    private EditText editTextContent;
+    private long noteId = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,28 +25,46 @@ public class CreateNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_note);
         applyWindowInsets();
 
-        EditText editTextTitle = findViewById(R.id.editTextTitle);
-        EditText editTextContent = findViewById(R.id.editTextContent);
+        editTextTitle = findViewById(R.id.editTextTitle);
+        editTextContent = findViewById(R.id.editTextContent);
 
-        findViewById(R.id.buttonOk).setOnClickListener(view -> {
-            String title = editTextTitle.getText().toString().trim();
-            String content = editTextContent.getText().toString();
-
-            if (title.isEmpty()) {
-                editTextTitle.setError(getString(R.string.error_title_required));
-                editTextTitle.requestFocus();
+        noteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
+        if (noteId >= 0) {
+            Note note = NoteRepository.getInstance(this).getNote(noteId);
+            if (note == null) {
+                finish();
                 return;
             }
+            editTextTitle.setText(note.getTitle());
+            editTextContent.setText(note.getContent());
+        }
 
-            NoteRepository.getInstance(this).addNote(new Note(title, content));
-            setResult(RESULT_OK);
-            finish();
-        });
-
+        findViewById(R.id.buttonOk).setOnClickListener(view -> saveNote());
         findViewById(R.id.buttonCancel).setOnClickListener(view -> {
             setResult(RESULT_CANCELED);
             finish();
         });
+    }
+
+    private void saveNote() {
+        String title = editTextTitle.getText().toString().trim();
+        String content = editTextContent.getText().toString();
+
+        if (title.isEmpty()) {
+            editTextTitle.setError(getString(R.string.error_title_required));
+            editTextTitle.requestFocus();
+            return;
+        }
+
+        NoteRepository repository = NoteRepository.getInstance(this);
+        if (noteId >= 0) {
+            repository.updateNote(noteId, title, content);
+        } else {
+            repository.addNote(title, content);
+        }
+
+        setResult(RESULT_OK);
+        finish();
     }
 
     private void applyWindowInsets() {

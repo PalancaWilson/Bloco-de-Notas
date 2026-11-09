@@ -6,6 +6,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>
     <string name="back">Voltar</string>
+    <string name="edit">Editar</string>
     <string name="empty_notes">Nenhuma nota criada.</string>
     <string name="error_title_required">Introduza o título da nota.</string>
 </resources>

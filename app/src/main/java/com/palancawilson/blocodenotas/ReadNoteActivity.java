@@ -1,5 +1,6 @@
 package com.palancawilson.blocodenotas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -12,8 +13,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class ReadNoteActivity extends AppCompatActivity {
 
-    public static final String EXTRA_TITLE = "com.palancawilson.blocodenotas.EXTRA_TITLE";
-    public static final String EXTRA_CONTENT = "com.palancawilson.blocodenotas.EXTRA_CONTENT";
+    public static final String EXTRA_NOTE_ID = "com.palancawilson.blocodenotas.EXTRA_NOTE_ID";
+
+    private long noteId;
+    private TextView textViewTitle;
+    private TextView textViewContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,13 +26,38 @@ public class ReadNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_read_note);
         applyWindowInsets();
 
-        TextView textViewTitle = findViewById(R.id.textViewTitle);
-        TextView textViewContent = findViewById(R.id.textViewContent);
+        noteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
+        if (NoteRepository.getInstance(this).getNote(noteId) == null) {
+            finish();
+            return;
+        }
 
-        textViewTitle.setText(getIntent().getStringExtra(EXTRA_TITLE));
-        textViewContent.setText(getIntent().getStringExtra(EXTRA_CONTENT));
+        textViewTitle = findViewById(R.id.textViewTitle);
+        textViewContent = findViewById(R.id.textViewContent);
+
+        findViewById(R.id.buttonEdit).setOnClickListener(view -> {
+            Intent intent = new Intent(this, CreateNoteActivity.class);
+            intent.putExtra(CreateNoteActivity.EXTRA_NOTE_ID, noteId);
+            startActivity(intent);
+        });
 
         findViewById(R.id.buttonBack).setOnClickListener(view -> finish());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showNote();
+    }
+
+    private void showNote() {
+        Note note = NoteRepository.getInstance(this).getNote(noteId);
+        if (note == null) {
+            finish();
+            return;
+        }
+        textViewTitle.setText(note.getTitle());
+        textViewContent.setText(note.getContent());
     }
 
     private void applyWindowInsets() {

@@ -20,6 +20,7 @@ public final class NoteRepository {
 
     private final SharedPreferences preferences;
     private final List<Note> notes = new ArrayList<>();
+    private long nextId = 1;
 
     private NoteRepository(Context context) {
         preferences = context.getApplicationContext()
@@ -38,8 +39,27 @@ public final class NoteRepository {
         return Collections.unmodifiableList(new ArrayList<>(notes));
     }
 
-    public void addNote(Note note) {
-        notes.add(note);
+    public Note getNote(long id) {
+        for (Note note : notes) {
+            if (note.getId() == id) {
+                return note;
+            }
+        }
+        return null;
+    }
+
+    public void addNote(String title, String content) {
+        notes.add(new Note(nextId++, title, content));
+        save();
+    }
+
+    public void updateNote(long id, String title, String content) {
+        Note note = getNote(id);
+        if (note == null) {
+            return;
+        }
+        note.setTitle(title);
+        note.setContent(content);
         save();
     }
 
@@ -53,7 +73,13 @@ public final class NoteRepository {
             JSONArray array = new JSONArray(json);
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
+                long id = object.optLong("id", 0);
+                if (id <= 0) {
+                    id = nextId;
+                }
+                nextId = Math.max(nextId, id + 1);
                 notes.add(new Note(
+                        id,
                         object.optString("title", ""),
                         object.optString("content", "")
                 ));
@@ -67,6 +93,7 @@ public final class NoteRepository {
         for (Note note : notes) {
             JSONObject object = new JSONObject();
             try {
+                object.put("id", note.getId());
                 object.put("title", note.getTitle());
                 object.put("content", note.getContent());
             } catch (JSONException ignored) {
