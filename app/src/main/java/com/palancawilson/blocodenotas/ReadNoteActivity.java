@@ -12,82 +12,94 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+/**
+ * Atividade que mostra o título e o texto de uma nota.
+ * Também permite editar ou apagar essa nota.
+ */
 public class ReadNoteActivity extends AppCompatActivity {
 
-    public static final String EXTRA_NOTE_ID = "com.palancawilson.blocodenotas.EXTRA_NOTE_ID";
+    public static final String EXTRA_ID_NOTA = "com.palancawilson.blocodenotas.EXTRA_NOTE_ID";
 
-    private long noteId;
-    private TextView textViewTitle;
-    private TextView textViewContent;
+    private long idNota;
+    private TextView textoTitulo;
+    private TextView textoConteudo;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle estadoGuardado) {
+        super.onCreate(estadoGuardado);
         WindowCompat.enableEdgeToEdge(getWindow());
         setContentView(R.layout.activity_read_note);
-        applyWindowInsets();
+        ajustarEspacoDasBarras();
 
-        noteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
-        if (NoteRepository.getInstance(this).getNote(noteId) == null) {
+        // Recebe o identificador da nota que deve ser mostrada.
+        idNota = getIntent().getLongExtra(EXTRA_ID_NOTA, -1);
+        if (RepositorioNotas.obterInstancia(this).obterNota(idNota) == null) {
             finish();
             return;
         }
 
-        textViewTitle = findViewById(R.id.textViewTitle);
-        textViewContent = findViewById(R.id.textViewContent);
+        textoTitulo = findViewById(R.id.textoTitulo);
+        textoConteudo = findViewById(R.id.textoConteudo);
 
-        findViewById(R.id.buttonEdit).setOnClickListener(view -> {
-            Intent intent = new Intent(this, CreateNoteActivity.class);
-            intent.putExtra(CreateNoteActivity.EXTRA_NOTE_ID, noteId);
-            startActivity(intent);
+        // O botão Editar abre a mesma atividade de criação, mas em modo de edição.
+        findViewById(R.id.botaoEditar).setOnClickListener(visao -> {
+            Intent intencao = new Intent(this, CreateNoteActivity.class);
+            intencao.putExtra(CreateNoteActivity.EXTRA_ID_NOTA, idNota);
+            startActivity(intencao);
         });
 
-        findViewById(R.id.buttonDelete).setOnClickListener(view ->
+        // O botão Apagar pede confirmação antes de remover a nota.
+        findViewById(R.id.botaoApagar).setOnClickListener(visao ->
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.delete_note_title)
-                        .setMessage(R.string.delete_note_message)
-                        .setNegativeButton(R.string.cancel, null)
-                        .setPositiveButton(R.string.delete, (dialog, which) -> {
-                            NoteRepository.getInstance(this).deleteNote(noteId);
+                        .setTitle(R.string.apagar_nota_titulo)
+                        .setMessage(R.string.apagar_nota_mensagem)
+                        .setNegativeButton(R.string.cancelar, null)
+                        .setPositiveButton(R.string.apagar, (dialogo, opcao) -> {
+                            RepositorioNotas.obterInstancia(this).apagarNota(idNota);
                             finish();
                         })
                         .show());
 
-        findViewById(R.id.buttonBack).setOnClickListener(view -> finish());
+        // O botão Voltar apenas fecha esta atividade.
+        findViewById(R.id.botaoVoltar).setOnClickListener(visao -> finish());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        showNote();
+
+        // Volta a mostrar a nota para refletir alterações feitas no modo de edição.
+        mostrarNota();
     }
 
-    private void showNote() {
-        Note note = NoteRepository.getInstance(this).getNote(noteId);
-        if (note == null) {
+    // Coloca o título e o texto da nota nos campos do ecrã.
+    private void mostrarNota() {
+        Nota nota = RepositorioNotas.obterInstancia(this).obterNota(idNota);
+        if (nota == null) {
             finish();
             return;
         }
-        textViewTitle.setText(note.getTitle());
-        textViewContent.setText(note.getContent());
+        textoTitulo.setText(nota.obterTitulo());
+        textoConteudo.setText(nota.obterConteudo());
     }
 
-    private void applyWindowInsets() {
-        View root = findViewById(R.id.main);
-        int paddingLeft = root.getPaddingLeft();
-        int paddingTop = root.getPaddingTop();
-        int paddingRight = root.getPaddingRight();
-        int paddingBottom = root.getPaddingBottom();
+    // Evita que o conteúdo fique escondido atrás das barras do sistema.
+    private void ajustarEspacoDasBarras() {
+        View raiz = findViewById(R.id.raiz);
+        int espacoEsquerda = raiz.getPaddingLeft();
+        int espacoTopo = raiz.getPaddingTop();
+        int espacoDireita = raiz.getPaddingRight();
+        int espacoFundo = raiz.getPaddingBottom();
 
-        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(
-                    paddingLeft + systemBars.left,
-                    paddingTop + systemBars.top,
-                    paddingRight + systemBars.right,
-                    paddingBottom + systemBars.bottom
+        ViewCompat.setOnApplyWindowInsetsListener(raiz, (visao, margens) -> {
+            Insets barrasSistema = margens.getInsets(WindowInsetsCompat.Type.systemBars());
+            visao.setPadding(
+                    espacoEsquerda + barrasSistema.left,
+                    espacoTopo + barrasSistema.top,
+                    espacoDireita + barrasSistema.right,
+                    espacoFundo + barrasSistema.bottom
             );
-            return insets;
+            return margens;
         });
     }
 }

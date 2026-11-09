@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ecra principal: lista de notas e botao para criar uma nova nota. -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/raiz"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     tools:context=".ListNotesActivity">
 
+    <!-- Lista onde aparece o titulo de cada nota. -->
     <ListView
-        android:id="@+id/listViewNotes"
+        android:id="@+id/listaNotas"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@id/buttonNewNote"
+        app:layout_constraintBottom_toTopOf="@id/botaoNovaNota"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Mensagem mostrada quando a lista esta vazia. -->
     <TextView
-        android:id="@+id/textViewEmpty"
+        android:id="@+id/textoListaVazia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/empty_notes"
+        android:text="@string/sem_notas"
         android:textAppearance="?attr/textAppearanceBodyLarge"
-        app:layout_constraintBottom_toBottomOf="@id/listViewNotes"
-        app:layout_constraintEnd_toEndOf="@id/listViewNotes"
-        app:layout_constraintStart_toStartOf="@id/listViewNotes"
-        app:layout_constraintTop_toTopOf="@id/listViewNotes" />
+        app:layout_constraintBottom_toBottomOf="@id/listaNotas"
+        app:layout_constraintEnd_toEndOf="@id/listaNotas"
+        app:layout_constraintStart_toStartOf="@id/listaNotas"
+        app:layout_constraintTop_toTopOf="@id/listaNotas" />
 
+    <!-- Botao que abre a atividade de criacao de notas. -->
     <Button
-        android:id="@+id/buttonNewNote"
+        android:id="@+id/botaoNovaNota"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/new_note"
+        android:text="@string/nova_nota"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

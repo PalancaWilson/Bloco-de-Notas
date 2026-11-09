@@ -10,79 +10,89 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+/**
+ * Atividade usada para criar uma nova nota ou editar uma nota existente.
+ * Se receber um identificador de nota, entra em modo de edição.
+ */
 public class CreateNoteActivity extends AppCompatActivity {
 
-    public static final String EXTRA_NOTE_ID = "com.palancawilson.blocodenotas.EXTRA_NOTE_ID";
+    public static final String EXTRA_ID_NOTA = "com.palancawilson.blocodenotas.EXTRA_NOTE_ID";
 
-    private EditText editTextTitle;
-    private EditText editTextContent;
-    private long noteId = -1;
+    private EditText campoTitulo;
+    private EditText campoTexto;
+    private long idNota = -1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle estadoGuardado) {
+        super.onCreate(estadoGuardado);
         WindowCompat.enableEdgeToEdge(getWindow());
         setContentView(R.layout.activity_create_note);
-        applyWindowInsets();
+        ajustarEspacoDasBarras();
 
-        editTextTitle = findViewById(R.id.editTextTitle);
-        editTextContent = findViewById(R.id.editTextContent);
+        campoTitulo = findViewById(R.id.campoTitulo);
+        campoTexto = findViewById(R.id.campoTexto);
 
-        noteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
-        if (noteId >= 0) {
-            Note note = NoteRepository.getInstance(this).getNote(noteId);
-            if (note == null) {
+        // Se recebemos um identificador, estamos a editar uma nota existente.
+        idNota = getIntent().getLongExtra(EXTRA_ID_NOTA, -1);
+        if (idNota >= 0) {
+            Nota nota = RepositorioNotas.obterInstancia(this).obterNota(idNota);
+            if (nota == null) {
                 finish();
                 return;
             }
-            editTextTitle.setText(note.getTitle());
-            editTextContent.setText(note.getContent());
+
+            // Preenche os campos com os dados atuais da nota.
+            campoTitulo.setText(nota.obterTitulo());
+            campoTexto.setText(nota.obterConteudo());
         }
 
-        findViewById(R.id.buttonOk).setOnClickListener(view -> saveNote());
-        findViewById(R.id.buttonCancel).setOnClickListener(view -> {
+        findViewById(R.id.botaoOk).setOnClickListener(visao -> guardarNota());
+        findViewById(R.id.botaoCancelar).setOnClickListener(visao -> {
             setResult(RESULT_CANCELED);
             finish();
         });
     }
 
-    private void saveNote() {
-        String title = editTextTitle.getText().toString().trim();
-        String content = editTextContent.getText().toString();
+    // Valida os campos e guarda a nota (nova ou editada).
+    private void guardarNota() {
+        String titulo = campoTitulo.getText().toString().trim();
+        String conteudo = campoTexto.getText().toString();
 
-        if (title.isEmpty()) {
-            editTextTitle.setError(getString(R.string.error_title_required));
-            editTextTitle.requestFocus();
+        // O título é obrigatório.
+        if (titulo.isEmpty()) {
+            campoTitulo.setError(getString(R.string.erro_titulo_obrigatorio));
+            campoTitulo.requestFocus();
             return;
         }
 
-        NoteRepository repository = NoteRepository.getInstance(this);
-        if (noteId >= 0) {
-            repository.updateNote(noteId, title, content);
+        RepositorioNotas repositorio = RepositorioNotas.obterInstancia(this);
+        if (idNota >= 0) {
+            repositorio.atualizarNota(idNota, titulo, conteudo);
         } else {
-            repository.addNote(title, content);
+            repositorio.adicionarNota(titulo, conteudo);
         }
 
         setResult(RESULT_OK);
         finish();
     }
 
-    private void applyWindowInsets() {
-        View root = findViewById(R.id.main);
-        int paddingLeft = root.getPaddingLeft();
-        int paddingTop = root.getPaddingTop();
-        int paddingRight = root.getPaddingRight();
-        int paddingBottom = root.getPaddingBottom();
+    // Evita que o conteúdo fique escondido atrás das barras do sistema.
+    private void ajustarEspacoDasBarras() {
+        View raiz = findViewById(R.id.raiz);
+        int espacoEsquerda = raiz.getPaddingLeft();
+        int espacoTopo = raiz.getPaddingTop();
+        int espacoDireita = raiz.getPaddingRight();
+        int espacoFundo = raiz.getPaddingBottom();
 
-        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(
-                    paddingLeft + systemBars.left,
-                    paddingTop + systemBars.top,
-                    paddingRight + systemBars.right,
-                    paddingBottom + systemBars.bottom
+        ViewCompat.setOnApplyWindowInsetsListener(raiz, (visao, margens) -> {
+            Insets barrasSistema = margens.getInsets(WindowInsetsCompat.Type.systemBars());
+            visao.setPadding(
+                    espacoEsquerda + barrasSistema.left,
+                    espacoTopo + barrasSistema.top,
+                    espacoDireita + barrasSistema.right,
+                    espacoFundo + barrasSistema.bottom
             );
-            return insets;
+            return margens;
         });
     }
 }

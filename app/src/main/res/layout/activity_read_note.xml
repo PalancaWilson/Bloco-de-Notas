@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ecra que mostra o titulo e o texto de uma nota. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/raiz"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".ReadNoteActivity">
 
+    <!-- Titulo da nota. -->
     <TextView
-        android:id="@+id/textViewTitle"
+        android:id="@+id/textoTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceHeadlineSmall" />
 
+    <!-- Texto da nota, com deslocamento caso seja longo. -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -21,7 +24,7 @@
         android:layout_weight="1">
 
         <TextView
-            android:id="@+id/textViewContent"
+            android:id="@+id/textoConteudo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceBodyLarge"
@@ -29,6 +32,7 @@
 
     </ScrollView>
 
+    <!-- Botoes para apagar, editar ou voltar. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,24 +41,24 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/buttonDelete"
+            android:id="@+id/botaoApagar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/delete" />
+            android:text="@string/apagar" />
 
         <Button
-            android:id="@+id/buttonEdit"
+            android:id="@+id/botaoEditar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/edit" />
+            android:text="@string/editar" />
 
         <Button
-            android:id="@+id/buttonBack"
+            android:id="@+id/botaoVoltar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/back" />
+            android:text="@string/voltar" />
 
     </LinearLayout>
 
