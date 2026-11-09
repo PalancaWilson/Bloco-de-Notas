@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -40,6 +41,17 @@ public class ReadNoteActivity extends AppCompatActivity {
             intent.putExtra(CreateNoteActivity.EXTRA_NOTE_ID, noteId);
             startActivity(intent);
         });
+
+        findViewById(R.id.buttonDelete).setOnClickListener(view ->
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.delete_note_title)
+                        .setMessage(R.string.delete_note_message)
+                        .setNegativeButton(R.string.cancel, null)
+                        .setPositiveButton(R.string.delete, (dialog, which) -> {
+                            NoteRepository.getInstance(this).deleteNote(noteId);
+                            finish();
+                        })
+                        .show());
 
         findViewById(R.id.buttonBack).setOnClickListener(view -> finish());
     }

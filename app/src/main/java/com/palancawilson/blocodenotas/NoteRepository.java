@@ -53,6 +53,11 @@ public final class NoteRepository {
         save();
     }
 
+    public void deleteNote(long id) {
+        notes.removeIf(note -> note.getId() == id);
+        save();
+    }
+
     public void updateNote(long id, String title, String content) {
         Note note = getNote(id);
         if (note == null) {
