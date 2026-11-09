@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Bloco de notas</string>
+    <string name="new_note">Nova Nota</string>
+    <string name="title_hint">Título</string>
+    <string name="content_hint">Texto da nota</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="back">Voltar</string>
+    <string name="empty_notes">Nenhuma nota criada.</string>
+    <string name="error_title_required">Introduza o título da nota.</string>
+</resources>
